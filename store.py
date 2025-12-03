@@ -36,7 +36,7 @@ class Manager:
 
     def add_product(self):
         product = input("Please enter your product: ")
-        price = input("Please enter your price: ")
+        price = int(input("Please enter your price: "))
         s1 = Product(product, price)
         self.products.append(s1)
 
@@ -83,14 +83,18 @@ class Manager:
 
         print("User topilmadi!")
 
-    def check_user(self,user_name):
+    def check_product_user(self,user_name):
+        t = 0
         for user in self.users:
+            print(f"Your current balance is {user.balance}")
             if user.user_name == user_name:
-                sui = 0
                 for product in user.korzinka:
+                    sui = 0
                     sui += product.amount * product.price
-                return sui
-        return None
+                    t+=sui
+                    print(f" - {product.name}  {product.price}$ {product.amount} Total : {sui}")
+            print("Your total is: ", t)
+
 
     def shopping(self,user_name):
         count = 0
@@ -110,7 +114,7 @@ class Manager:
                 count = 0
                 for pr in user.korzinka:
                     count += 1
-                    print(f"{count}. {pr.name} : {pr.price}")
+                    print(f"{count}. {pr.name} : {pr.price} {pr.amount}")
 
 
     def change_user_admin(self):
@@ -135,7 +139,11 @@ class Manager:
         b.name = input("Please enter your name: ")
         b.price = input("Please enter your price: ")
 
-
+    def clean_korzinka_user(self,user_name):
+        for user in self.users:
+            if user.user_name == user_name:
+                user.korzinka.clear()
+                print("Korzinka cleaned successfully!")
 
     def login(self,user_name,password):
         for user1 in self.users:
@@ -147,12 +155,50 @@ class Manager:
 
         return 0
 
+    def edit_profile_user(self,user_name):
+        for user in self.users:
+            if user.user_name == user_name:
+                user.user_name = input("Please enter your new username: ")
+                user.email = input("Please enter your new email: ")
+                user.phone = input("Please enter your new phone: ")
+                user.password = input("Please enter your new password: ")
+
+    def sum(self,user_name):
+        s = 0
+        for user in self.users:
+            if user.user_name == user_name:
+                for pr in user.korzinka:
+                    s += pr.amount * pr.price
+        return s
+
+    def buy(self,user_name):
+        for user in self.users:
+            if user.user_name == user_name:
+                print(f"Your balance is {user.balance}")
+                print(f"Products cost total is {self.sum(user_name)}")
+                if user.balance < self.sum(user_name):
+                    print("Not enough balance")
+                elif self.sum(user_name) == 0:
+                    print("There is nothing to buy")
+                else:
+                    print("Purchase was successful")
+                    user.balance = user.balance - self.sum(user_name)
+                    print(f"Your balance is {user.balance}")
+                    self.clean_korzinka_user(user_name)
+
+    def insert_money_user(self,user_name):
+        for user in self.users:
+            if user.name == user_name:
+                add = int(input("Please enter how much money you want to add: "))
+                user.balance += add
+                print(f"Your balance is {user.balance}")
+
 
 s = Manager()
-admin = User('Admin','','123','1111','1000')
+admin = User('Admin','','123','1111',0)
 admin.is_admin = True
 s.users.append(admin)
-user = User('User','','123','1111','1000')
+user = User('User','','123','1111',1000)
 s.users.append(user)
 
 def Main(m:Manager):
@@ -205,15 +251,24 @@ def Main(m:Manager):
         elif m.login(user_name, password) == 2:  #user-------menu
             while True:
                 print("Welcome User!")
-                a = input(" 1.Buy some products\n 2.View korzinka\n 3.Check\n 4.Exit\n--->")
+                a = input(" 1.Buy some products\n 2.View korzinka\n 3.Check\n 4.Buy \n 5.Clean korzinka\n 6.Edit profile\n 7.Insert money\n 8.Exit \n--->")
                 if a == "1":
                     m.shopping(user_name)
                 elif a == "2":
-                    m.shopping(user_name)
+                    m.view_korzinka(user_name)
                 elif a == "3":
-                    m.check_user(user_name)
+                    m.check_product_user(user_name)
+                elif a == "4":
+                    m.buy(user_name)
+                elif a == "5":
+                    m.clean_korzinka_user(user_name)
+                elif a == "6":
+                    m.edit_profile_user(user_name)
+                elif a == "7":
+                    m.insert_money_user(user_name)
                 else:
                     break
         else:
             print("No user found !")
+
 Main(s)
