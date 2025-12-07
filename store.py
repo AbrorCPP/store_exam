@@ -1,8 +1,8 @@
 class Product:
-    def __init__(self, name, price):
+    def __init__(self, name, price,amount):
         self.name = name
         self.price = price
-        self.amount = 0
+        self.amount = amount
 
 class User:
     def __init__(self, user_name, email, phone, password,balance):
@@ -37,14 +37,15 @@ class Manager:
     def add_product(self):
         product = input("Please enter your product: ")
         price = int(input("Please enter your price: "))
-        s1 = Product(product, price)
+        amount = int(input("Please enter your amount: "))
+        s1 = Product(product, price,amount)
         self.products.append(s1)
 
     def show_products(self):
         count = 0
         for product in self.products:
             count += 1
-            print(f"{count}. {product.name}  {product.price}$ {product.amount}")
+            print(f"{count}. {product.name}  {product.price}$   {product.amount}")
 
     def get_user(self,user_name1):
         for user1 in self.users:
@@ -75,9 +76,7 @@ class Manager:
                     if product.name == product_name and product.price == product_price:
                         product.amount += product_amount
                         return
-
-                new_p = Product(product_name, product_price)
-                new_p.amount = product_amount
+                new_p = Product(product_name, product_price,product_amount)
                 user.korzinka.append(new_p)
                 return
 
@@ -103,8 +102,7 @@ class Manager:
             print(f"{count}. {pr.name} : {pr.price}")
         a = int(input("Please enter the product id: "))
         b = int(input("Please enter your amount: "))
-        s1 = Product(self.products[a-1].name, self.products[a-1].price)
-        s1.amount += b
+        s1 = Product(self.products[a-1].name, self.products[a-1].price,self.products[a-1].amount + b)
         self.add_korzinka(user_name, s1.name, s1.price, s1.amount)
         print("Accepted")
 
@@ -138,6 +136,7 @@ class Manager:
         b = self.products[product_id-1]
         b.name = input("Please enter your name: ")
         b.price = input("Please enter your price: ")
+        b.amount = int(input("Please enter your amount: "))
 
     def clean_korzinka_user(self,user_name):
         for user in self.users:
@@ -187,11 +186,11 @@ class Manager:
                     self.clean_korzinka_user(user_name)
 
     def insert_money_user(self,user_name):
-        for user in self.users:
-            if user.name == user_name:
+        for user1 in self.users:
+            if user1.user_name == user_name:
                 add = int(input("Please enter how much money you want to add: "))
-                user.balance += add
-                print(f"Your balance is {user.balance}")
+                user1.balance += add
+                print(f"Your balance is {user1.balance}")
 
 
 s = Manager()
