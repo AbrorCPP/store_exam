@@ -1,3 +1,6 @@
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import A4
+
 class Product:
     def __init__(self, name, price,amount):
         self.name = name
@@ -99,12 +102,16 @@ class Manager:
         count = 0
         for pr in self.products:
             count += 1
-            print(f"{count}. {pr.name} : {pr.price}")
+            print(f"{count}. {pr.name} : {pr.price}$  {pr.amount} kg available")
         a = int(input("Please enter the product id: "))
         b = int(input("Please enter your amount: "))
-        s1 = Product(self.products[a-1].name, self.products[a-1].price,self.products[a-1].amount + b)
-        self.add_korzinka(user_name, s1.name, s1.price, s1.amount)
-        print("Accepted")
+        if b > self.products[a-1].amount:
+            print("Sorry, the product amount is not available")
+        else:
+            s1 = Product(self.products[a-1].name, self.products[a-1].price,b)
+            self.products[a-1].amount -= b
+            self.add_korzinka(user_name, s1.name, s1.price, s1.amount)
+            print("Accepted")
 
     def view_korzinka(self,user_name):
         for user in self.users:
@@ -192,82 +199,113 @@ class Manager:
                 user1.balance += add
                 print(f"Your balance is {user1.balance}")
 
+    def edit_product_user(self,user_name):
+        for user in self.users:
+            if user.user_name == user_name:
+                self.show_products()
+                a = int(input("Please enter your product id: "))
+                try:
+                    pr = user.korzinka[a-1]
+                    while True:
+                        print(pr.name, pr.price ,"$", pr.amount, "kg")
+                        a = input(" 1.add\n 2.subtract\n 3.exit\n")
+                        if a == "1":
+                            pr.amount += 1
+                        elif a == "2":
+                            pr.amount -= 1
+                        elif pr.amount == 0:
+                            user.korzinka.clear()
+                        else:
+                            break
+                except:
+                    print("Wrong product id")
+
+
+
 
 s = Manager()
 admin = User('Admin','','123','1111',0)
 admin.is_admin = True
 s.users.append(admin)
-user = User('User','','123','1111',1000)
-s.users.append(user)
+user1 = User('User1','','123','1111',1000)
+s.users.append(user1)
+user2 = User('User2','','123','1111',1000)
+s.users.append(user2)
+
 
 def Main(m:Manager):
     while True:
-        print("Welcome to Korzinka!")
-        user_name = input("Please enter your username: ")
-        password = input("Please enter your password: ")
-        if m.login(user_name,password) == 1:  #admin ----------- menu
-            while True:
-                print("Welcome Admin!")
-                a = input(" 1.add menu\n 2.print menu\n 3.edit menu\n 4.delete menu\n 5.exit")
-                if a == "1":
-                    while True:
-                        b = input(" 1.add user\n 2.add product\n 3.exit")
-                        if b == "1":
-                            m.add_user()
-                        elif b == "2":
-                            m.add_product()
-                        else:
-                            break
-                elif a == "2":
-                    while True:
-                        b = input(" 1.print users\n 2.print products\n 3.exit")
-                        if b == "1":
-                            m.print_users()
-                        elif b == "2":
-                            m.show_products()
-                        else:
-                            break
-                elif a == "3":
-                    while True:
-                        b = input(" 1.edit user\n 2.edit product\n 3.exit")
-                        if b == "1":
-                            m.change_user_admin()
-                        elif b == "2":
-                            m.change_product_admin()
-                        else:
-                            break
-                elif a == "4":
-                    while True:
-                        b = input(" 1.delete user\n 2.delete product\n 3.exit\n--->")
-                        if b == "1":
-                            m.remove_user()
-                        elif b == "2":
-                            m.remove_product()
-                        else:
-                            break
-                else:
-                    break
-        elif m.login(user_name, password) == 2:  #user-------menu
-            while True:
-                print("Welcome User!")
-                a = input(" 1.Buy some products\n 2.View korzinka\n 3.Check\n 4.Buy \n 5.Clean korzinka\n 6.Edit profile\n 7.Insert money\n 8.Exit \n--->")
-                if a == "1":
-                    m.shopping(user_name)
-                elif a == "2":
-                    m.view_korzinka(user_name)
-                elif a == "3":
-                    m.check_product_user(user_name)
-                elif a == "4":
-                    m.buy(user_name)
-                elif a == "5":
-                    m.clean_korzinka_user(user_name)
-                elif a == "6":
-                    m.edit_profile_user(user_name)
-                elif a == "7":
-                    m.insert_money_user(user_name)
-                else:
-                    break
-        else:
-            print("No user found !")
+        a = input(" 1.Login\n 2.Create new account\n")
+        if a == "1":
+            print("Welcome to Korzinka!")
+            user_name = input("Please enter your username: ")
+            password = input("Please enter your password: ")
+            if m.login(user_name,password) == 1:  #admin ----------- menu
+                while True:
+                    print("Welcome Admin!")
+                    a = input(" 1.add menu\n 2.print menu\n 3.edit menu\n 4.delete menu\n 5.exit")
+                    if a == "1":
+                        while True:
+                            b = input(" 1.add product\n 3.exit")
+                            if b == "1":
+                                m.add_product()
+                            else:
+                                break
+                    elif a == "2":
+                        while True:
+                            b = input(" 1.print users\n 2.print products\n 3.exit")
+                            if b == "1":
+                                m.print_users()
+                            elif b == "2":
+                                m.show_products()
+                            else:
+                                break
+                    elif a == "3":
+                        while True:
+                            b = input(" 1.edit user\n 2.edit product\n 3.exit")
+                            if b == "1":
+                                m.change_user_admin()
+                            elif b == "2":
+                                m.change_product_admin()
+                            else:
+                                break
+                    elif a == "4":
+                        while True:
+                            b = input(" 1.delete user\n 2.delete product\n 3.exit\n--->")
+                            if b == "1":
+                                m.remove_user()
+                            elif b == "2":
+                                m.remove_product()
+                            else:
+                                break
+                    else:
+                        break
+            elif m.login(user_name, password) == 2:  #user-------menu
+                while True:
+                    print("Welcome User!")
+                    a = input(" 1.Buy some products\n 2.View korzinka\n 3.Check\n 4.Buy \n 5.Clean korzinka\n 6.Edit profile\n 7.Insert money\n 8.Exit \n--->")
+                    if a == "1":
+                        m.shopping(user_name)
+                    elif a == "2":
+                        m.view_korzinka(user_name)
+                    elif a == "3":
+                        m.edit_product_user(user_name)
+                    elif a == "4":
+                        m.buy(user_name)
+                    elif a == "5":
+                        m.clean_korzinka_user(user_name)
+                    elif a == "6":
+                        m.edit_profile_user(user_name)
+                    elif a == "7":
+                        m.insert_money_user(user_name)
+                    elif a == "8":
+                        m.check_product_user(user_name)
+                    else:
+                        break
+            else:
+                print("No user found !")
+        elif a == "2":
+            print(" Welcome to register program")
+            m.add_user()
 
 Main(s)
