@@ -224,7 +224,7 @@ class Manager:
                         a += f"{pr.name} {pr.amount} {pr.price}"
                         a += f" cost: {pr.amount*pr.price}"
                     a+= f"{self.sum(user_name)}"
-                    user.history.append()
+                    user.history.append(a)
                     self.clean_korzinka_user(user_name)
 
     def insert_money_user(self,user_name):
@@ -260,7 +260,7 @@ class Manager:
         a = int(input("Please enter user id: "))
         user = self.users[a]
         for hs in user.history:
-            print(hs)
+            print(f"user bought {hs}")
 
 
 s = Manager()
