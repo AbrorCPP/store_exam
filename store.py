@@ -131,15 +131,17 @@ class Manager:
         for pr in self.products:
             count += 1
             print(f"{count}. {pr.name} : {pr.price}$  {pr.amount} kg available")
-        a = int(input("Please enter the product id: "))
-        b = int(input("Please enter your amount: "))
-        if b > self.products[a-1].amount:
-            print("Sorry, the product amount is not available")
-        else:
-            s1 = Product(self.products[a-1].name, self.products[a-1].price,b)
-            self.products[a-1].amount -= b
-            self.add_korzinka(user_name, s1.name, s1.price, s1.amount)
-            print("Accepted")
+        try:
+            a = int(input("Please enter the product id: "))
+            b = int(input("Please enter your amount: "))
+            if b > self.products[a-1].amount:
+                print("Sorry, the product amount is not available")
+            else:
+                s1 = Product(self.products[a-1].name, self.products[a-1].price,b)
+                self.add_korzinka(user_name, s1.name, s1.price, s1.amount)
+                print("Accepted")
+        except:
+            print("Sorry, the product doesn't exist")
 
     def view_korzinka(self,user_name):
         for user in self.users:
@@ -215,6 +217,13 @@ class Manager:
                 elif self.sum(user_name) == 0:
                     print("There is nothing to buy")
                 else:
+                    for pr in user.korzinka:
+                        for prod in self.products:
+                            if prod.name == pr.name:
+                                if prod.amount < pr.amount:
+                                    print("Not enough products!")
+                                    return
+                                prod.amount -= pr.amount
                     print("Purchase was successful")
                     user.balance = user.balance - self.sum(user_name)
                     print(f"Your balance is {user.balance}")
