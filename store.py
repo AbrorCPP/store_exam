@@ -16,6 +16,7 @@ class User:
         self.is_admin = False
         self.balance = balance
         self.korzinka = []
+        self.history = []
 
 class Manager:
     def __init__(self):
@@ -34,8 +35,9 @@ class Manager:
     def print_users(self):
         count = 0
         for user in self.users:
-            count += 1
-            print(f"{count}. {user.user_name} {user.email} {user.phone} {user.password} {user.balance}")
+            if not user.is_admin:
+                count += 1
+                print(f"{count}. {user.user_name} {user.email} {user.phone} {user.password} {user.balance}")
 
     def add_product(self):
         product = input("Please enter your product: ")
@@ -85,17 +87,43 @@ class Manager:
 
         print("User topilmadi!")
 
-    def check_product_user(self,user_name):
-        t = 0
+    def check_product_user(self, user_name):
         for user in self.users:
-            print(f"Your current balance is {user.balance}")
             if user.user_name == user_name:
-                for product in user.korzinka:
-                    sui = 0
-                    sui += product.amount * product.price
-                    t+=sui
-                    print(f" - {product.name}  {product.price}$ {product.amount} Total : {sui}")
-            print("Your total is: ", t)
+                file_name = f"receipt_{user_name}.pdf"
+                c = canvas.Canvas(file_name, pagesize=A4)
+                width, height = A4
+                y = height - 50
+                c.setFont("Helvetica-Bold", 16)
+                c.drawString(50, y, f"Receipt for {user.user_name}")
+                y -= 30
+                c.setFont("Helvetica", 12)
+                c.drawString(50, y, f"Email: {user.email}   Phone: {user.phone}")
+                y -= 20
+                c.drawString(50, y, "-" * 70)
+                y -= 20
+                total = 0
+                for i, product in enumerate(user.korzinka, 1):
+                    line_total = product.price * product.amount
+                    c.drawString(50, y, f"{i}. {product.name}  {product.price}$ x {product.amount} = {line_total}$")
+                    total += line_total
+                    y -= 20
+                    if y < 60:
+                        c.showPage()
+                        y = height - 50
+                c.drawString(50, y, "-" * 70)
+                y -= 20
+                c.setFont("Helvetica-Bold", 12)
+                c.drawString(50, y, f"Total: {total}$")
+                y -= 20
+                c.drawString(50, y, f"Your balance: {user.balance}$")
+                y -= 20
+                c.drawString(50, y, f"Balance after purchase: {user.balance - total}$")
+                y -= 40
+                c.drawString(50, y, "Thank you for shopping!")
+                c.save()
+                print(f"PDF successfully created: {file_name}")
+                return
 
 
     def shopping(self,user_name):
@@ -190,6 +218,13 @@ class Manager:
                     print("Purchase was successful")
                     user.balance = user.balance - self.sum(user_name)
                     print(f"Your balance is {user.balance}")
+                    self.check_product_user(user_name)
+                    a = f"{user_name} purchased successfully!"
+                    for pr in user.korzinka:
+                        a += f"{pr.name} {pr.amount} {pr.price}"
+                        a += f" cost: {pr.amount*pr.price}"
+                    a+= f"{self.sum(user_name)}"
+                    user.history.append()
                     self.clean_korzinka_user(user_name)
 
     def insert_money_user(self,user_name):
@@ -220,7 +255,12 @@ class Manager:
                 except:
                     print("Wrong product id")
 
-
+    def print_user_history(self):
+        self.print_users()
+        a = int(input("Please enter user id: "))
+        user = self.users[a]
+        for hs in user.history:
+            print(hs)
 
 
 s = Manager()
@@ -253,19 +293,19 @@ def Main(m:Manager):
                                 break
                     elif a == "2":
                         while True:
-                            b = input(" 1.print users\n 2.print products\n 3.exit")
+                            b = input(" 1.print users\n 2.print products\n 3.print user history\n 3.exit\n--->")
                             if b == "1":
                                 m.print_users()
                             elif b == "2":
                                 m.show_products()
+                            elif b == "3":
+                                m.print_user_history()
                             else:
                                 break
                     elif a == "3":
                         while True:
-                            b = input(" 1.edit user\n 2.edit product\n 3.exit")
+                            b = input(" 1.edit product\n 2.exit")
                             if b == "1":
-                                m.change_user_admin()
-                            elif b == "2":
                                 m.change_product_admin()
                             else:
                                 break
@@ -283,7 +323,7 @@ def Main(m:Manager):
             elif m.login(user_name, password) == 2:  #user-------menu
                 while True:
                     print("Welcome User!")
-                    a = input(" 1.Buy some products\n 2.View korzinka\n 3.Check\n 4.Buy \n 5.Clean korzinka\n 6.Edit profile\n 7.Insert money\n 8.Exit \n--->")
+                    a = input(" 1.Buy some products\n 2.View korzinka\n 3.Edit product\n 4.Buy \n 5.Clean korzinka\n 6.Edit profile\n 7.Insert money\n 8.Exit \n--->")
                     if a == "1":
                         m.shopping(user_name)
                     elif a == "2":
@@ -298,8 +338,6 @@ def Main(m:Manager):
                         m.edit_profile_user(user_name)
                     elif a == "7":
                         m.insert_money_user(user_name)
-                    elif a == "8":
-                        m.check_product_user(user_name)
                     else:
                         break
             else:
