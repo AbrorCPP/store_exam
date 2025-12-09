@@ -117,8 +117,6 @@ class Manager:
                 c.drawString(50, y, f"Total: {total}$")
                 y -= 20
                 c.drawString(50, y, f"Your balance: {user.balance}$")
-                y -= 20
-                c.drawString(50, y, f"Balance after purchase: {user.balance - total}$")
                 y -= 40
                 c.drawString(50, y, "Thank you for shopping!")
                 c.save()
@@ -200,12 +198,12 @@ class Manager:
                 user.password = input("Please enter your new password: ")
 
     def sum(self,user_name):
-        s = 0
+        summa = 0
         for user in self.users:
             if user.user_name == user_name:
                 for pr in user.korzinka:
-                    s += pr.amount * pr.price
-        return s
+                    summa += pr.amount * pr.price
+        return summa
 
     def buy(self,user_name):
         for user in self.users:
@@ -284,18 +282,20 @@ s.users.append(user2)
 
 def Main(m:Manager):
     while True:
-        a = input(" 1.Login\n 2.Create new account\n")
+        a = input(" 1.Login\n 2.Create new account\n--->")
         if a == "1":
+            print("*"*30)
             print("Welcome to Korzinka!")
             user_name = input("Please enter your username: ")
             password = input("Please enter your password: ")
             if m.login(user_name,password) == 1:  #admin ----------- menu
                 while True:
+                    print("="*30)
                     print("Welcome Admin!")
-                    a = input(" 1.add menu\n 2.print menu\n 3.edit menu\n 4.delete menu\n 5.exit")
+                    a = input(" 1.add menu\n 2.print menu\n 3.edit menu\n 4.delete menu\n 5.exit\n--->")
                     if a == "1":
                         while True:
-                            b = input(" 1.add product\n 3.exit")
+                            b = input(" 1.add product\n 2.exit")
                             if b == "1":
                                 m.add_product()
                             else:
@@ -331,6 +331,7 @@ def Main(m:Manager):
                         break
             elif m.login(user_name, password) == 2:  #user-------menu
                 while True:
+                    print("-"*30)
                     print("Welcome User!")
                     a = input(" 1.Buy some products\n 2.View korzinka\n 3.Edit product\n 4.Buy \n 5.Clean korzinka\n 6.Edit profile\n 7.Insert money\n 8.Exit \n--->")
                     if a == "1":
